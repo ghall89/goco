@@ -5,6 +5,7 @@ import (
 	"goco/internal/input"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/charmbracelet/huh/spinner"
 	git "github.com/go-git/go-git/v6"
@@ -72,14 +73,19 @@ func Push(r *git.Repository) error {
 		loadingMsg := "Pushing to " + remotes[0].String()
 
 		// get users public SSH keys
-		auth := PublicKeys()
+		// auth := PublicKeys()
 
 		err := spinner.New().
 			Title(loadingMsg).
 			Action(func() {
-				err := r.Push(&git.PushOptions{
-					Auth: auth,
-				})
+				// err := r.Push(&git.PushOptions{
+				// 	Auth: auth,
+				// })
+
+				// temporary workaround until I can look more into auth issues
+				cmd := exec.Command("git", "push")
+
+				err := cmd.Run()
 				if err != nil {
 					log.Fatal(err)
 				}
