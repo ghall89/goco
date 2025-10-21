@@ -41,4 +41,9 @@ func userInput(r *git.Repository) {
 	if commitErr != nil {
 		log.Fatal(commitErr)
 	}
+
+	pushErr := gitutils.Push(r)
+	if pushErr != nil {
+		log.Fatal(commitErr)
+	}
 }
