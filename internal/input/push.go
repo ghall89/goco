@@ -6,14 +6,12 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-func Push() bool {
-	var push bool
-
+func Push(push *bool) {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewConfirm().
 				Title("Push to remote?").
-				Value(&push),
+				Value(push),
 		),
 	)
 
@@ -21,6 +19,4 @@ func Push() bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return push
 }

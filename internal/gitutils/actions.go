@@ -3,8 +3,10 @@ package gitutils
 import (
 	"fmt"
 	"goco/internal/input"
+	"log"
 	"os"
 
+	"github.com/charmbracelet/huh/spinner"
 	git "github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing"
 )
@@ -50,8 +52,39 @@ func Commit(r *git.Repository) (plumbing.Hash, error) {
 	return hash, nil
 }
 
-func Push() {
-	// Check if repo has remote
-	// If true, ask user if they'd like to Push
-	// Push to remote, create remote branch if necessary
+func Push(r *git.Repository) error {
+	var push bool = false
+
+	remotes, err := r.Remotes()
+	if err != nil {
+		return err
+	}
+
+	input.Push(&push)
+
+	if len(remotes) == 0 {
+		return nil
+	}
+
+	if push == true {
+		loadingMsg := "Pushing to " + remotes[0].String()
+
+		err := spinner.New().
+			Title(loadingMsg).
+			Action(func() {
+				err := r.Push(&git.PushOptions{})
+				if err != nil {
+					log.Fatal(err)
+				}
+			}).
+			Run()
+
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("✔ Successfully pushed changes")
+	}
+
+	return nil
 }
