@@ -22,6 +22,8 @@ func Stage(r *git.Repository) error {
 		os.Exit(0)
 	}
 
+	// TODO: Add ability to select changes they'd like to stage
+
 	tree, err := Worktree(r)
 	if err != nil {
 		return err
@@ -69,10 +71,15 @@ func Push(r *git.Repository) error {
 	if push == true {
 		loadingMsg := "Pushing to " + remotes[0].String()
 
+		// get users public SSH keys
+		auth := PublicKeys()
+
 		err := spinner.New().
 			Title(loadingMsg).
 			Action(func() {
-				err := r.Push(&git.PushOptions{})
+				err := r.Push(&git.PushOptions{
+					Auth: auth,
+				})
 				if err != nil {
 					log.Fatal(err)
 				}
