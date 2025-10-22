@@ -3,6 +3,7 @@ package gitutils
 import (
 	"fmt"
 	"goco/internal/input"
+	"goco/internal/styles"
 	"log"
 	"os"
 	"os/exec"
@@ -96,7 +97,7 @@ func Push(r *git.Repository) error {
 			return err
 		}
 
-		fmt.Println("✔ Successfully pushed changes")
+		fmt.Println(styles.Success.Render("✔ Successfully pushed changes"))
 	}
 
 	return nil

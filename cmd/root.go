@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"goco/internal/fileutils"
 	"goco/internal/gitutils"
+	"goco/internal/styles"
 	"goco/internal/types"
-	"log"
 	"os"
 )
 
 func main() {
 	err := run()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(styles.Error.Render(err.Error()))
+		os.Exit(1)
 	}
 
-	os.Exit(0)
 }
 
 func run() error {

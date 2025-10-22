@@ -1,0 +1,39 @@
+version: "3"
+
+tasks:
+  install-deps:
+    cmds:
+      - go mod tidy
+
+  build-darwin:
+    desc: "Build Darwin binary"
+    cmds:
+      - go build -o ./out/goco-darwin ./cmd/root.go
+    env:
+      GOARCH: amd64
+      GOOS: darwin
+
+  build-linux:
+    desc: "Build Linux binary"
+    cmds:
+      - go build -o ./out/goco-linux ./cmd/root.go
+    env:
+      GOARCH: amd64
+      GOOS: linux
+
+  build-windows:
+    desc: "Build Windows binary"
+    cmds:
+      - go build -o ./out/goco-windows ./cmd/root.go
+    env:
+      GOARCH: amd64
+      GOOS: windows
+
+  build:
+    desc: "Build the app"
+    deps: [build-darwin, build-linux, build-windows]
+
+  default:
+    desc: "Run the app"
+    cmds:
+      - go run ./cmd/root.go
