@@ -1,49 +1,61 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"goco/internal/fileutils"
 	"goco/internal/gitutils"
+	"goco/internal/types"
 	"log"
 	"os"
-
-	"github.com/go-git/go-git/v6"
 )
 
 func main() {
-	path := "./"
-
-	exists, err := fileutils.Exists(path)
+	err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if exists == false {
-		fmt.Println("Not a valid directory.")
-		os.Exit(1)
+
+	os.Exit(0)
+}
+
+func run() error {
+	path := "./"
+
+	if err := validateDirectory(path); err != nil {
+		return err
 	}
 
 	repo, err := gitutils.Repository(path)
 	if err != nil {
-		fmt.Println("Not a git repo.")
-		os.Exit(1)
+		return errors.New("Not a git repo.")
 	}
 
-	userInput(repo)
+	svc := gitutils.NewAdapter(repo)
+	return commitAndPush(svc)
 }
 
-func userInput(r *git.Repository) {
-	stageErr := gitutils.Stage(r)
-	if stageErr != nil {
-		log.Fatal(stageErr)
+func validateDirectory(p string) error {
+	exists, err := fileutils.Exists(p)
+	if err != nil {
+		return err
+	}
+	if exists == false {
+		return errors.New("Not a valid directory.")
 	}
 
-	_, commitErr := gitutils.Commit(r)
-	if commitErr != nil {
-		log.Fatal(commitErr)
-	}
+	return nil
+}
 
-	pushErr := gitutils.Push(r)
-	if pushErr != nil {
-		log.Fatal(commitErr)
+func commitAndPush(svc types.GitService) error {
+	if err := svc.Stage(); err != nil {
+		return fmt.Errorf("stage: %w", err)
 	}
+	if err := svc.Commit(); err != nil {
+		return fmt.Errorf("commit: %w", err)
+	}
+	if err := svc.Push(); err != nil {
+		return fmt.Errorf("push: %w", err)
+	}
+	return nil
 }
